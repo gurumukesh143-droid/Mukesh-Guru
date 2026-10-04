@@ -1,3 +1,12 @@
+import heroMuralAsset from '../assets/images/hero_wall_mural_1791097267615.jpg';
+import artistAtWorkAsset from '../assets/images/artist_at_work_1791097286180.jpg';
+import odishaCafeMuralAsset from '../assets/images/traditional_odisha_mural_1791097305182.jpg';
+import portraitAndCanvasAsset from '../assets/images/portrait_sketch_canvas_1791097322356.jpg';
+import beforePlainWallAsset from '../assets/images/before_plain_wall_1791097334450.jpg';
+import igPeacockMuralAsset from '../assets/images/ig_peacock_mural_post_1791103651906.jpg';
+import igBuddhaCanvasAsset from '../assets/images/ig_buddha_canvas_post_1791103666417.jpg';
+import igKidsRoomMuralAsset from '../assets/images/ig_kids_room_mural_post_1791103680243.jpg';
+
 export interface ServiceItem {
   id: string;
   number: string;
@@ -59,14 +68,19 @@ export interface InstagramPostItem {
   permalink: string;
 }
 
+export const BUNDLED_FALLBACK_IMAGES = {
+  artistAtWork: artistAtWorkAsset,
+  igKidsRoomMural: igKidsRoomMuralAsset,
+};
+
 export const STUDIO_IMAGES = {
-  heroMural: '/src/assets/images/hero_wall_mural_1791097267615.jpg',
+  heroMural: heroMuralAsset,
   artistAtWork: '/MUKESH ARTIST.jpeg',
-  odishaCafeMural: '/src/assets/images/traditional_odisha_mural_1791097305182.jpg',
-  portraitAndCanvas: '/src/assets/images/portrait_sketch_canvas_1791097322356.jpg',
-  beforePlainWall: '/src/assets/images/before_plain_wall_1791097334450.jpg',
-  igPeacockMural: '/src/assets/images/ig_peacock_mural_post_1791103651906.jpg',
-  igBuddhaCanvas: '/src/assets/images/ig_buddha_canvas_post_1791103666417.jpg',
+  odishaCafeMural: odishaCafeMuralAsset,
+  portraitAndCanvas: portraitAndCanvasAsset,
+  beforePlainWall: beforePlainWallAsset,
+  igPeacockMural: igPeacockMuralAsset,
+  igBuddhaCanvas: igBuddhaCanvasAsset,
   igKidsRoomMural: 'MUKESH PAINTING.jpg',
 };
 

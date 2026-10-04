@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Palette } from 'lucide-react';
-import { STUDIO_IMAGES } from '../data/studioData';
+import { STUDIO_IMAGES, BUNDLED_FALLBACK_IMAGES } from '../data/studioData';
 
 export const ARTIST_PHOTO_STORAGE_KEY = 'guruart_main_artist_photo';
 export const ARTIST_PHOTO_EVENT = 'guruart-artist-photo-updated';
@@ -26,6 +26,24 @@ export function setStoredArtistPhoto(dataUrl: string | null): void {
   window.dispatchEvent(new CustomEvent(ARTIST_PHOTO_EVENT, { detail: dataUrl }));
 }
 
+function withBaseUrl(rawPath: string): string {
+  if (
+    !rawPath ||
+    rawPath.startsWith('data:') ||
+    rawPath.startsWith('http://') ||
+    rawPath.startsWith('https://') ||
+    rawPath.startsWith('blob:')
+  ) {
+    return rawPath;
+  }
+  const baseUrl = import.meta.env.BASE_URL || '/';
+  if (rawPath.startsWith(baseUrl)) {
+    return rawPath;
+  }
+  const cleanRelative = rawPath.replace(/^\/+/, '');
+  return `${baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`}${cleanRelative}`;
+}
+
 interface StudioImageProps {
   src: string;
   alt: string;
@@ -36,9 +54,17 @@ interface StudioImageProps {
 
 const ARTIST_AT_WORK_PATHS = new Set([
   STUDIO_IMAGES.artistAtWork,
-  '/src/assets/images/artist_at_work_1791097286180.jpg',
   '/MUKESH ARTIST.jpeg',
+  'MUKESH ARTIST.jpeg',
   '/src/assets/images/MUKESH ARTIST.jpeg',
+  '/src/assets/images/artist_at_work_1791097286180.jpg',
+]);
+
+const MUKESH_PAINTING_PATHS = new Set([
+  STUDIO_IMAGES.igKidsRoomMural,
+  'MUKESH PAINTING.jpg',
+  '/MUKESH PAINTING.jpg',
+  '/src/assets/images/MUKESH PAINTING.jpg',
 ]);
 
 export const StudioImage: React.FC<StudioImageProps> = ({
@@ -49,6 +75,8 @@ export const StudioImage: React.FC<StudioImageProps> = ({
   loading = 'lazy',
 }) => {
   const isArtistAtWorkSlot = ARTIST_AT_WORK_PATHS.has(src);
+  const isMukeshPaintingSlot = MUKESH_PAINTING_PATHS.has(src);
+
   const [customArtistPhoto, setCustomArtistPhoto] = useState<string | null>(() =>
     isArtistAtWorkSlot ? getStoredArtistPhoto() : null
   );
@@ -74,21 +102,25 @@ export const StudioImage: React.FC<StudioImageProps> = ({
     return () => window.removeEventListener(ARTIST_PHOTO_EVENT, handlePhotoUpdate);
   }, [isArtistAtWorkSlot]);
 
-  // Candidate resolution order for the Artist at Work photo:
-  // 1. Exact user-uploaded MUKESH ARTIST.jpeg stored in browser (unaltered)
-  // 2. /MUKESH ARTIST.jpeg (if uploaded to workspace root/public)
-  // 3. /src/assets/images/MUKESH ARTIST.jpeg (if uploaded to assets/images)
-  // 4. /src/assets/images/artist_at_work_1791097286180.jpg
   const resolveEffectiveSrc = (): string => {
-    if (!isArtistAtWorkSlot) return src;
-    if (customArtistPhoto) return customArtistPhoto;
-    if (fallbackStep === 0) return '/MUKESH ARTIST.jpeg';
-    if (fallbackStep === 1) return '/src/assets/images/MUKESH ARTIST.jpeg';
-    return '/src/assets/images/artist_at_work_1791097286180.jpg';
+    if (isArtistAtWorkSlot) {
+      if (customArtistPhoto) return customArtistPhoto;
+      if (fallbackStep === 0) return withBaseUrl('MUKESH ARTIST.jpeg');
+      if (fallbackStep === 1) return withBaseUrl('src/assets/images/MUKESH ARTIST.jpeg');
+      return BUNDLED_FALLBACK_IMAGES.artistAtWork;
+    }
+
+    if (isMukeshPaintingSlot) {
+      if (fallbackStep === 0) return withBaseUrl('MUKESH PAINTING.jpg');
+      if (fallbackStep === 1) return withBaseUrl('src/assets/images/MUKESH PAINTING.jpg');
+      return BUNDLED_FALLBACK_IMAGES.igKidsRoomMural;
+    }
+
+    return withBaseUrl(src);
   };
 
   const handleImageError = () => {
-    if (isArtistAtWorkSlot && !customArtistPhoto && fallbackStep < 2) {
+    if ((isArtistAtWorkSlot && !customArtistPhoto && fallbackStep < 2) || (isMukeshPaintingSlot && fallbackStep < 2)) {
       setFallbackStep((prev) => prev + 1);
       return;
     }
