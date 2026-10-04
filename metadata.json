@@ -1,0 +1,6 @@
+{
+  "name": "GURUART — Turning Walls Into Art",
+  "description": "Professional creative art, custom wall murals, home painting, portraits, and commission artwork studio by Mukesh Guru in Junagarh, Odisha, India.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
